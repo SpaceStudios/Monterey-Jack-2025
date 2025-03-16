@@ -8,7 +8,7 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.Constants.driveIDs;
+import static frc.robot.Constants.DrivetrainConstants.*;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
@@ -17,7 +17,10 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.units.measure.LinearVelocity;
 
@@ -30,6 +33,9 @@ public class DrivetrainIO_SparkMax implements DrivetrainIO {
 
     RelativeEncoder leftEncoder;
     RelativeEncoder rightEncoder;
+    
+    DifferentialDrivePoseEstimator poseEstimator;
+    DifferentialDriveKinematics kinematics;
 
     public DrivetrainIO_SparkMax() {
         frontLeftSpark = new SparkMax(driveIDs[0][0], MotorType.kBrushless);
@@ -56,6 +62,8 @@ public class DrivetrainIO_SparkMax implements DrivetrainIO {
 
         leftEncoder = frontLeftSpark.getEncoder();
         rightEncoder = frontRightSpark.getEncoder();
+        kinematics = new DifferentialDriveKinematics(0.5);
+        poseEstimator = new DifferentialDrivePoseEstimator(kinematics, new Rotation2d(), 0, 0, new Pose2d());
     }
 
     @Override
@@ -91,6 +99,6 @@ public class DrivetrainIO_SparkMax implements DrivetrainIO {
         data.rightDriveVelocity = RPM.of(rightEncoder.getVelocity());
         data.rightDriveVoltage = Volts.of(frontRightSpark.getBusVoltage()*frontRightSpark.getAppliedOutput());
 
-        data.estimatedPose = new Pose2d();
+        data.estimatedPose = poseEstimator.getEstimatedPosition();
     }
 }

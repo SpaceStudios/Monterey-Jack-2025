@@ -5,7 +5,7 @@
 package frc.robot.subsystems.drivetrain;
 
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.Constants.*;
+import static frc.robot.Constants.DrivetrainConstants.*;
 
 import org.littletonrobotics.junction.Logger;
 
